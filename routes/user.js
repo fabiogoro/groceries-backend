@@ -4,7 +4,7 @@ var formHandler = require('../util/formHandler')
 
 router.get('/', async function(req, res, next) {
   if(req.session.user){
-    res.json(req.session.user);
+    res.json(await req.DAL.getUser({email: req.session.user.email}));
   }
   else {
     res.json({})
