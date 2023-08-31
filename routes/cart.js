@@ -20,7 +20,7 @@ router.post('/add/:id', async function(req, res, next) {
     let cartId = await req.DAL.getCartId(req.session.user)
     if(cartId==undefined){
       let cart = await req.DAL.insertCart(req.session.user)
-      let cartId = await req.DAL.getCartId(req.session.user)
+      cartId = await req.DAL.getCartId(req.session.user)
     }
     let cart = await req.DAL.getCart(cartId)
     let grocery = cart.filter((g)=>g.id==req.params.id)[0]
