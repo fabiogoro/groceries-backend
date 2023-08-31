@@ -6,7 +6,7 @@ router.post('/', async (req, res) => {
 
   if (user) {
     req.session.user = user
-    res.json({success: 'User successfully authenticated'});
+    res.json({success: 'User successfully authenticated', redirect: '/'});
   } else {
     res.json({
       error: 'Invalid email or password',

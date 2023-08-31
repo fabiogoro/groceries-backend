@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
     res.json({success: 'You will receive an email with further instructions.'});
   } else {
     res.json({
-      error: 'Invalid email',
+      error: {field: 'email', message: 'Invalid email',}
     });
   }
 });

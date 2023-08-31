@@ -1,8 +1,12 @@
-function formHandler(callback, required=[]){
+function formHandler(callback, required=[], customValidation=null){
   return async function(req, res, next) {
+    if(customValidation){
+      const error = await customValidation(req)
+      if(error) return res.json(error)
+    }
     for(r of required){
       if(!req.body[r]){
-        return res.json({error: `Field ${r} is required.`})
+        return res.json({error: {field: r, message: `Field ${r} is required.`}})
       }
     }
     try{

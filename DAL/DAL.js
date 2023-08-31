@@ -63,7 +63,7 @@ VALUES(${cart}, ${grocery}, 1)`))
   }
 
   async createUser({name, email, password, phone}){
-    return await this.connection.execute(`INSERT user (email, name, phone, password) values('${email}', '${name}', '${phone}', '${encrypt(password)}')`)
+    return await this.connection.execute(`INSERT user (email, name, phone, password) values('${email}', '${name}', ${phone?`'${phone}'`:'null'}, '${encrypt(password)}')`)
   }
 
   async connect(){

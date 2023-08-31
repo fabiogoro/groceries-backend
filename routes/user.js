@@ -11,6 +11,17 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.post('/', formHandler('createUser', required=['email', 'password']));
+async function signUpValidations(req){
+  const user = await req.DAL.getUserByEmail(req.body)
+  if(user) return {
+    error: 
+    {
+      field: 'email', 
+      message: `The email '${req.body.email}' is already signed up.`
+    },
+  }
+}
+
+router.post('/', formHandler('createUser', required=['email', 'password', 'name'], signUpValidations));
 
 module.exports = router;
