@@ -29,6 +29,7 @@ function corsMiddleware(req, res, next) {
 
 
 var indexRouter = require('./routes/index');
+var orderRouter = require('./routes/order');
 var userRouter = require('./routes/user');
 var usersRouter = require('./routes/users');
 var groceryRouter = require('./routes/grocery');
@@ -58,6 +59,7 @@ app.use(passwordResetMiddleware)
 app.use(corsMiddleware)
 
 app.use('/', indexRouter);
+app.use('/order', orderRouter);
 app.use('/users', usersRouter);
 app.use('/user', userRouter);
 app.use('/grocery', groceryRouter);

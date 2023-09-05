@@ -25,7 +25,11 @@ class DAL{
   }
 
   async getUser({email, password}){
-    return (await this.connection.execute(`SELECT * FROM user where email='${email}' ${password?`and password='${encrypt(password)}'`:''}`))[0][0]
+    const user = (await this.connection.execute(`SELECT * FROM user where email='${email}' ${password?`and password='${encrypt(password)}'`:''}`))[0][0]
+    if(user){
+      user.addresses = (await this.connection.execute(`SELECT zip_code, address.address, city, state, id, country FROM address join user_address on user_address.address=id where user='${user.id}'`))[0]
+    }
+    return user
   }
 
   async getCartId({email}){
@@ -64,6 +68,21 @@ VALUES(${cart}, ${grocery}, 1)`))
 
   async createUser({name, email, password, phone}){
     return await this.connection.execute(`INSERT user (email, name, phone, password) values('${email}', '${name}', ${phone?`'${phone}'`:'null'}, '${encrypt(password)}')`)
+  }
+
+  async createOrder({address_id, cart, user_id}){
+    const response = await this.connection.execute(`INSERT \`order\` (user, address) values(${user_id}, ${address_id})`)
+    for(const g of cart){
+      const responseGrocery = await this.connection.execute(`INSERT grocery_order (\`order\`, grocery, quantity, price) values(${response[0].insertId}, ${g.id}, ${g.quantity}, ${g.price})`)
+      const responseRemove = await this.connection.execute(`DELETE FROM grocery_cart where cart=${g.cart_id} and grocery=${g.id}`)
+    }
+    return {}
+  }
+
+  async createAddress({address, zip_code, city, state, country, user_id}){
+    const response = await this.connection.execute(`INSERT address (address, zip_code, city, state, country) values('${address}', '${zip_code}', '${city}', '${state}', '${country}')`)
+    const responseUser = await this.connection.execute(`INSERT user_address (user, address) values('${user_id}', '${response[0].insertId}')`)
+    return response[0].insertId
   }
 
   async connect(){
