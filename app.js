@@ -10,6 +10,7 @@ var corsMiddleware = require('./middlewares/corsMiddleware')
 
 var indexRouter = require('./routes/index');
 var orderRouter = require('./routes/order');
+var ordersRouter = require('./routes/orders');
 var userRouter = require('./routes/user');
 var usersRouter = require('./routes/users');
 var groceryRouter = require('./routes/grocery');
@@ -39,6 +40,7 @@ app.use(corsMiddleware)
 
 app.use('/', indexRouter);
 app.use('/order', orderRouter);
+app.use('/orders', ordersRouter);
 app.use('/users', usersRouter);
 app.use('/user', userRouter);
 app.use('/grocery', groceryRouter);
