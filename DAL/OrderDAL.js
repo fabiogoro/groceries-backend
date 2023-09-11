@@ -18,6 +18,19 @@ class OrderDAL extends DAL{
     }
     return {}
   }
+
+  async getOrders({user}){
+    const res = (await this.connection.execute(`
+      SELECT *, 
+        (select sum(price)*sum(quantity) from grocery_order where \`order\`=id) total_price, 
+        (select sum(quantity) from grocery_order where \`order\`=id) total_products 
+      FROM \`order\` 
+      WHERE
+        user=${user}
+      ORDER BY order_date DESC
+    `))[0]
+    return res
+  }
 }
 
 module.exports = new OrderDAL()
