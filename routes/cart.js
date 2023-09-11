@@ -1,11 +1,12 @@
 var express = require('express');
+var cartDAL = require('../DAL/CartDAL');
 var router = express.Router();
 
 router.get('/', async function(req, res, next) {
   if(req.session.user){
-    let cartId = await req.DAL.getCartId(req.session.user)
+    let cartId = await cartDAL.getCartId(req.session.user)
     if(cartId){
-      res.json(await req.DAL.getCart(cartId));
+      res.json(await cartDAL.getCart(cartId));
     } else {
       res.json([])
     }
@@ -17,19 +18,19 @@ router.get('/', async function(req, res, next) {
 
 router.post('/add/:id', async function(req, res, next) {
   if(req.session.user){
-    let cartId = await req.DAL.getCartId(req.session.user)
+    let cartId = await cartDAL.getCartId(req.session.user)
     if(cartId==undefined){
-      let cart = await req.DAL.insertCart(req.session.user)
-      cartId = await req.DAL.getCartId(req.session.user)
+      let cart = await cartDAL.insertCart(req.session.user)
+      cartId = await cartDAL.getCartId(req.session.user)
     }
-    let cart = await req.DAL.getCart(cartId)
+    let cart = await cartDAL.getCart(cartId)
     let grocery = cart.filter((g)=>g.id==req.params.id)[0]
     if(grocery){
-      await req.DAL.updateQuantityGroceryCart({cart: grocery.cart_id, grocery: grocery.id, amount: +1})
+      await cartDAL.updateQuantityGroceryCart({cart: grocery.cart_id, grocery: grocery.id, amount: +1})
     } else {
-      await req.DAL.insertGroceryCart({cart: cartId.id, grocery: req.params.id})
+      await cartDAL.insertGroceryCart({cart: cartId.id, grocery: req.params.id})
     }
-    cart = await req.DAL.getCart(cartId)
+    cart = await cartDAL.getCart(cartId)
     res.json(cart);
   }
   else {
@@ -39,15 +40,15 @@ router.post('/add/:id', async function(req, res, next) {
 
 router.post('/remove/:id', async function(req, res, next) {
   if(req.session.user){
-    let cartId = await req.DAL.getCartId(req.session.user)
-    let cart = await req.DAL.getCart(cartId)
+    let cartId = await cartDAL.getCartId(req.session.user)
+    let cart = await cartDAL.getCart(cartId)
     let grocery = cart.filter((g)=>g.id==req.params.id)[0]
     if(grocery.quantity>1){
-      await req.DAL.updateQuantityGroceryCart({cart: grocery.cart_id, grocery: grocery.id, amount: -1})
+      await cartDAL.updateQuantityGroceryCart({cart: grocery.cart_id, grocery: grocery.id, amount: -1})
     } else {
-      await req.DAL.deleteGroceryCart({cart: grocery.cart_id, grocery: grocery.id})
+      await cartDAL.deleteGroceryCart({cart: grocery.cart_id, grocery: grocery.id})
     }
-    cart = await req.DAL.getCart(cartId)
+    cart = await cartDAL.getCart(cartId)
     res.json(cart);
   }
   else {

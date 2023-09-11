@@ -1,11 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var formHandler = require('../util/formHandler')
+var userDAL = require('../DAL/UserDAL');
 
 router.get('/', async function(req, res, next) {
-  res.json(await req.DAL.getUsers());
+  res.json(await userDAL.getUsers());
 });
-
-router.post('/', formHandler('createUser', required=['email', 'password']));
 
 module.exports = router;

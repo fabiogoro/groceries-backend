@@ -1,8 +1,9 @@
 var express = require('express');
+var userDAL = require('../DAL/UserDAL');
 var router = express.Router();
 
 router.post('/', async (req, res) => {
-  const user = await req.DAL.getUser(req.body)
+  const user = await userDAL.getUser(req.body)
 
   if (user) {
     req.session.user = user
