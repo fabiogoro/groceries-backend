@@ -4,29 +4,9 @@ var session = require('express-session')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-let DAL = require('./DAL/DAL')
-var passwordResetHelper = require('./util/passwordResetHelper')
 
-
-async function DALMiddleware(req, res, next){
-  req.DAL = DAL
-  next()
-}
-
-async function passwordResetMiddleware(req, res, next){
-  req.passwordResetHelper = passwordResetHelper
-  next()
-}
-
-function corsMiddleware(req, res, next) {
-    res.append('Access-Control-Allow-Origin', ['http://localhost:3001']);
-    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.append('Access-Control-Allow-Headers', 'Content-Type');
-    res.append('Access-Control-Allow-Credentials', 'true');
-    next();
-}
-
-
+var passwordResetMiddleware = require('./middlewares/passwordResetMiddleware')
+var corsMiddleware = require('./middlewares/corsMiddleware')
 
 var indexRouter = require('./routes/index');
 var orderRouter = require('./routes/order');
@@ -54,7 +34,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(DALMiddleware)
 app.use(passwordResetMiddleware)
 app.use(corsMiddleware)
 

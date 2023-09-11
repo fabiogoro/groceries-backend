@@ -1,9 +1,10 @@
 var express = require('express');
 var sendMail = require('../util/mailer');
+var userDAL = require('../DAL/UserDAL');
 var router = express.Router();
 
 router.post('/', async (req, res) => {
-  const user = await req.DAL.getUserByEmail(req.body)
+  const user = await userDAL.getUserByEmail(req.body)
 
   if (user) {
     const authToken = req.passwordResetHelper.registerPasswordReset(user)
@@ -26,7 +27,7 @@ router.post('/', async (req, res) => {
 router.post('/password', async (req, res) => {
   const user = req.passwordResetHelper.consumePasswordResetToken(req.body.token)
   if(user){
-    req.DAL.updateUserPassword(req.body.password, user.id)
+    userDAL.updateUserPassword(req.body.password, user.id)
     res.json({success: 'Password successfully updated.'})
   }else{
     res.json({error: 'Invalid token.'})

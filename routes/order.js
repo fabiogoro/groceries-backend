@@ -1,13 +1,14 @@
 var express = require('express');
 var router = express.Router();
-var formHandler = require('../util/formHandler')
+var orderDAL = require('../DAL/OrderDAL');
+var userDAL = require('../DAL/UserDAL');
+var cartDAL = require('../DAL/CartDAL');
 
-router.get('/', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
   if(req.session.user){
-    res.json({})
-    res.json(await req.DAL.getUser({email: req.session.user.email}));
-  }
-  else {
+    const response = await orderDAL.getOrder({id: req.params.id, user: req.session.user.id})
+    res.json(response);
+  } else {
     res.json({})
   }
 });
@@ -15,13 +16,13 @@ router.get('/', async function(req, res, next) {
 router.post('/', async (req, res) => {
   if (req.session.user) {
     if(!req.body.address_id){
-      req.body.address_id = await req.DAL.createAddress({...req.body, user_id: req.session.user.id})
+      req.body.address_id = await userDAL.createAddress({...req.body, user_id: req.session.user.id})
     }
-    const cartId = await req.DAL.getCartId(req.session.user)
+    const cartId = await cartDAL.getCartId(req.session.user)
     if(cartId) {
-      const cart = await req.DAL.getCart(cartId)
-      req.DAL.createOrder({...req.body, cart: cart, user_id: req.session.user.id})
-      res.json({});
+      const cart = await cartDAL.getCart(cartId)
+      const order = await orderDAL.createOrder({...req.body, cart: cart, user_id: req.session.user.id})
+      res.json({success: 'Thanks for purchasing with us. We will be in touch soon about your order. Here is your receipt.', redirect: `/order/${order}?message=${'Thanks for purchasing with us. We will be in touch soon about your order. Here is your receipt.'}`});
     } else {
       res.json({
         error: 'You must add products to the cart before placing an order.',

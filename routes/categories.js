@@ -1,8 +1,9 @@
 var express = require('express');
+var categoryDAL = require('../DAL/CategoryDAL')
 var router = express.Router();
 
 router.get('/', async function(req, res, next) {
-  res.json(await req.DAL.getCategories());
+  res.json(await categoryDAL.getCategories());
 });
 
 module.exports = router;
