@@ -19,8 +19,8 @@ class OrderDAL extends DAL{
     return {}
   }
 
-  async getOrders({user}){
-    const res = (await this.connection.execute(`
+  async getOrders({user, page}){
+    const results = (await this.connection.execute(`
       SELECT *, 
         (select sum(price)*sum(quantity) from grocery_order where \`order\`=id) total_price, 
         (select sum(quantity) from grocery_order where \`order\`=id) total_products 
@@ -28,8 +28,10 @@ class OrderDAL extends DAL{
       WHERE
         user=${user}
       ORDER BY order_date DESC
+      LIMIT ${(page-1)*20},${page*20}
     `))[0]
-    return res
+    const pages = (await this.connection.execute(`SELECT ceil(count(id)/20) pages FROM \`order\` WHERE user=${user}`))[0][0]
+    return {...pages, results}
   }
 }
 
