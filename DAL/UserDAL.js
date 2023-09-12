@@ -59,6 +59,10 @@ class UserDAL extends DAL{
   async updateUserPassword(password, id){
     return (await this.connection.execute(`UPDATE user set password='${encrypt(password)}' where id='${id}'`))[0][0]
   }
+
+  async updateUserPhone({phone, id}){
+    return (await this.connection.execute(`UPDATE user set phone='${phone}' where id='${id}'`))[0][0]
+  }
 }
 
 module.exports = new UserDAL()

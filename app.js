@@ -17,6 +17,7 @@ var groceryRouter = require('./routes/grocery');
 var groceriesRouter = require('./routes/groceries');
 var categoriesRouter = require('./routes/categories');
 var cartRouter = require('./routes/cart');
+var profileRouter = require('./routes/profile');
 var loginRouter = require('./routes/login');
 var logoffRouter = require('./routes/logoff');
 var resetRouter = require('./routes/reset');
@@ -48,6 +49,7 @@ app.use('/groceries', groceriesRouter);
 app.use('/categories', categoriesRouter);
 app.use('/carts?', cartRouter);
 app.use('/login', loginRouter);
+app.use('/profile', profileRouter);
 app.use('/reset', resetRouter);
 app.use('/logoff', logoffRouter);
 
