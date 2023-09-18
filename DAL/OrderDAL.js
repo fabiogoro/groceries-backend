@@ -11,26 +11,58 @@ class OrderDAL extends DAL{
   }
 
   async getOrder({id, user}){
-    const res = (await this.connection.execute(`SELECT * FROM \`order\` where id=${id} and user=${user}`))[0][0]
+    let res = undefined
+    if(user.is_admin){
+      res = (await this.connection.execute(`SELECT * FROM \`order\` where id=${id}`))[0][0]
+    } else {
+      res = (await this.connection.execute(`SELECT * FROM \`order\` where id=${id} and user=${user.id}`))[0][0]
+    }
     if(res){
       res.groceries = (await this.connection.execute(`SELECT * FROM grocery_order join grocery on grocery=id where \`order\`=${id}`))[0]
+      res.address_info = (await this.connection.execute(`SELECT * FROM address where id=${res.address}`))[0][0]
+      res.user_info = (await this.connection.execute(`SELECT * FROM user where id=${res.user}`))[0][0]
       return res
     }
     return {}
   }
 
-  async getOrders({user, page}){
+  async getOrders({page, q}){
     const results = (await this.connection.execute(`
-      SELECT *, 
-        (select sum(price)*sum(quantity) from grocery_order where \`order\`=id) total_price, 
-        (select sum(quantity) from grocery_order where \`order\`=id) total_products 
-      FROM \`order\` 
-      WHERE
-        user=${user}
-      ORDER BY order_date DESC
-      LIMIT ${(page-1)*20},${page*20}
-    `))[0]
-    const pages = (await this.connection.execute(`SELECT ceil(count(id)/20) pages FROM \`order\` WHERE user=${user}`))[0][0]
+        SELECT *, 
+          (SELECT sum(price)*sum(quantity) FROM grocery_order WHERE \`order\`=id) total_price, 
+          (SELECT sum(quantity) FROM grocery_order WHERE \`order\`=id) total_products ,
+          (SELECT email FROM user WHERE id=user) user_email
+        FROM \`order\` 
+        HAVING (SELECT email FROM user WHERE id=user) like '%${q}%' or id like '%${q}%'
+        ORDER BY order_date DESC
+        LIMIT ${(page-1)*20},${page*20}
+      `))[0]
+    const pages = (await this.connection.execute(`
+    SELECT ceil(count(id)/20) pages, user, id FROM \`order\`
+    HAVING (SELECT email FROM user WHERE id=user) like '%${q}%' or id like '%${q}%'
+    `))[0][0]
+    return {...pages, results}
+  }
+
+  async getOrdersFromUser({user, page, q}){
+    const results = (await this.connection.execute(`
+        SELECT *, 
+          (select sum(price)*sum(quantity) from grocery_order where \`order\`=id) total_price, 
+          (select sum(quantity) from grocery_order where \`order\`=id) total_products 
+        FROM \`order\` 
+        WHERE
+          user=${user}
+          AND id like '%${q}%'
+        ORDER BY order_date DESC
+        LIMIT ${(page-1)*20},${page*20}
+      `))[0]
+    const pages = (await this.connection.execute(`
+    SELECT ceil(count(id)/20) pages 
+    FROM \`order\` 
+    WHERE 
+      user=${user}
+      AND id like '%${q}%'
+    `))[0][0]
     return {...pages, results}
   }
 }

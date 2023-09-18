@@ -14,6 +14,10 @@ class DAL{
       password: process.env.DB_PASS
     })
   }
+
+  cleanParams(params){
+    return params.map(mysql.escape)
+  }
 }
 
 module.exports = DAL;
