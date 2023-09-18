@@ -2,13 +2,38 @@ const DAL = require('./DAL')
 
 class GroceryDAL extends DAL{
   async getGroceries({sort_by, categories, q, page}){
-    const results = (await this.connection.execute(`SELECT *, (select path from grocery_picture where grocery=grocery.id limit 1) thumbnail, (select name from category where category=category.id) category_name FROM grocery where title like '%${q}%' ${categories?` and category in (${categories})`:''} ORDER BY ${sort_by.replace('.',' ')} LIMIT ${(page-1)*20},${page*20}`))[0]
-    const pages = (await this.connection.execute(`SELECT ceil(count(id)/20) pages FROM grocery where title like '%${q}%' ${categories?` and category in (${categories})`:''}`))[0][0]
+    const results = (await this.connection.execute(`
+      SELECT *, 
+        (select path from grocery_picture where grocery=grocery.id limit 1) thumbnail, 
+        (select name from category where category=category.id) category_name 
+      FROM grocery 
+      WHERE 
+        title LIKE '%${q}%' 
+        ${categories?` 
+          AND category IN (${categories})
+          `:''} 
+      ORDER BY ${sort_by.replace('.',' ')} 
+      LIMIT ${(page-1)*20},${page*20}
+    `))[0]
+    const pages = (await this.connection.execute(`
+      SELECT ceil(count(id)/20) pages 
+      FROM grocery 
+      WHERE 
+        title LIKE '%${q}%' 
+        ${categories?` 
+          AND category in (${categories})
+          `:''}
+    `))[0][0]
     return {...pages, results}
   }
 
   async getGrocery(id){
-    const res = (await this.connection.execute(`SELECT *, (select name from category where category.id=category) category_name FROM grocery where id=${id}`))[0][0]
+    const res = (await this.connection.execute(`
+      SELECT *, 
+        (select name from category where category.id=category) category_name 
+      FROM grocery 
+      WHERE id=${id}
+    `))[0][0]
     res.pictures = (await this.connection.execute(`select path from grocery_picture where grocery=${id}`))[0]
     return res
   }
@@ -37,14 +62,14 @@ class GroceryDAL extends DAL{
                         category
                       ) 
                values (
-                        '${title}', 
-                        '${description}', 
-                        ${price}, 
-                        ${calories}, 
-                        ${proteins}, 
-                        ${carbohydrates}, 
-                        ${fats}, 
-                        ${category}
+                        ${this.escape(title)}, 
+                        ${this.escape(description)}, 
+                        ${this.escape(price)}, 
+                        ${this.escape(calories)}, 
+                        ${this.escape(proteins)}, 
+                        ${this.escape(carbohydrates)}, 
+                        ${this.escape(fats)}, 
+                        ${this.escape(category)}
                       )
         `)
     const response2 = await this.connection.execute(`
@@ -54,7 +79,7 @@ class GroceryDAL extends DAL{
                       ) 
                values (
                         ${response[0].insertId}, 
-                        '${image}'
+                        ${this.escape(image)}
                       )
         `)
     return response2
@@ -66,18 +91,20 @@ class GroceryDAL extends DAL{
                         category,
                         image, id, fats, proteins, carbohydrates, calories}){
     const response = await this.connection.execute(`
-          UPDATE grocery set title='${title}', 
-                        description='${description}', 
-                        price=${price}, 
-                        calories=${calories}, 
-                        proteins=${proteins}, 
-                        carbohydrates=${carbohydrates}, 
-                        fats=${fats}, 
-                        category=${category}
+          UPDATE grocery SET 
+                        title=${this.escape(title)}, 
+                        description=${this.escape(description)}, 
+                        price=${this.escape(price)}, 
+                        calories=${this.escape(calories)}, 
+                        proteins=${this.escape(proteins)}, 
+                        carbohydrates=${this.escape(carbohydrates)}, 
+                        fats=${this.escape(fats)}, 
+                        category=${this.escape(category)}
           WHERE id=${id}
         `)
     const response2 = await this.connection.execute(`
-          UPDATE grocery_picture set path='${image}'
+          UPDATE grocery_picture 
+          SET path=${this.escape(image)}
           WHERE grocery=${id}
         `)
     return response2
