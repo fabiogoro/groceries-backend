@@ -15,8 +15,8 @@ class DAL{
     })
   }
 
-  cleanParams(params){
-    return params.map(mysql.escape)
+  escape(param){
+    return mysql.escape(param)
   }
 }
 

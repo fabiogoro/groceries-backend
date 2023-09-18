@@ -2,7 +2,7 @@ const DAL = require('./DAL')
 
 class OrderDAL extends DAL{
   async createOrder({address_id, cart, user_id}){
-    const response = await this.connection.execute(`INSERT \`order\` (user, address) values(${user_id}, ${address_id})`)
+    const response = await this.connection.execute(`INSERT \`order\` (user, address) values(${user_id}, ${this.escape(address_id)})`)
     for(const g of cart){
       const responseGrocery = await this.connection.execute(`INSERT grocery_order (\`order\`, grocery, quantity, price) values(${response[0].insertId}, ${g.id}, ${g.quantity}, ${g.price})`)
       const responseRemove = await this.connection.execute(`DELETE FROM grocery_cart where cart=${g.cart_id} and grocery=${g.id}`)

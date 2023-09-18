@@ -1,12 +1,26 @@
 const encrypt = require('../util/encrypt')
-const mysql = require('mysql2/promise')
 const DAL = require('./DAL')
 
 class UserDAL extends DAL{
   async getUser({email, password}){
-    const user = (await this.connection.execute(`SELECT * FROM user where email=${mysql.escape(email)} ${password?`and password='${encrypt(password)}'`:''}`))[0][0]
+    const user = (await this.connection.execute(`
+      SELECT * FROM user 
+      WHERE 
+        email=${this.escape(email)} ${password?`
+        AND password='${encrypt(password)}'`:''}
+    `))[0][0]
     if(user){
-      user.addresses = (await this.connection.execute(`SELECT zip_code, address.address, city, state, id, country FROM address join user_address on user_address.address=id where user='${user.id}'`))[0]
+      user.addresses = (await this.connection.execute(`
+        SELECT 
+          zip_code, 
+          address.address, 
+          city, 
+          state, 
+          id, 
+          country
+        FROM address JOIN user_address ON user_address.address=id 
+        WHERE user='${user.id}'
+      `))[0]
       user.cart = (await this.connection.execute(`
         SELECT 
           h.cart cart_id, 
@@ -23,11 +37,15 @@ class UserDAL extends DAL{
   }
 
   async getUsers(){
-    return (await this.connection.execute(`SELECT * FROM user`))[0]
+    return (await this.connection.execute(`
+      SELECT * FROM user
+    `))[0]
   }
 
   async getUserByEmail({email}){
-    return (await this.connection.execute(`SELECT * FROM user where email='${email}'`))[0][0]
+    return (await this.connection.execute(`
+      SELECT * FROM user where email=${this.escape(email)}
+    `))[0][0]
   }
 
   async createUser({name, email, password, phone}){
@@ -38,10 +56,10 @@ class UserDAL extends DAL{
                         phone, 
                         password
                       ) 
-               values (
-                        '${email}', 
-                        '${name}', 
-                        ${phone?`'${phone}'`:'null'}, 
+          VALUES      (
+                        ${this.escape(email)}, 
+                        ${this.escape(name)}, 
+                        ${phone?`${this.escape(phone)}`:'null'}, 
                         '${encrypt(password)}'
                       )
         `)
@@ -50,18 +68,37 @@ class UserDAL extends DAL{
 
   async createAddress({address, zip_code, city, state, country, user_id}){
     const response = await this.connection.execute(`
-                        INSERT address (address, zip_code, city, state, country) 
-                        values('${address}', '${zip_code}', '${city}', '${state}', '${country}')`)
-    const responseUser = await this.connection.execute(`INSERT user_address (user, address) values('${user_id}', '${response[0].insertId}')`)
+      INSERT address (
+        address, 
+        zip_code, 
+        city, 
+        state, 
+        country
+      ) VALUES (
+        ${this.escape(address)}, 
+        ${this.escape(zip_code)}, 
+        ${this.escape(city)}, 
+        ${this.escape(state)}, 
+        ${this.escape(country)}
+      )
+    `)
+    const responseUser = await this.connection.execute(`
+      INSERT user_address (user, address) 
+      VALUES ('${user_id}', '${response[0].insertId}')
+    `)
     return response[0].insertId
   }
 
   async updateUserPassword(password, id){
-    return (await this.connection.execute(`UPDATE user set password='${encrypt(password)}' where id='${id}'`))[0][0]
+    return (await this.connection.execute(`
+      UPDATE user SET password='${encrypt(password)}' WHERE id=${id}
+    `))[0][0]
   }
 
   async updateUserPhone({phone, id}){
-    return (await this.connection.execute(`UPDATE user set phone='${phone}' where id='${id}'`))[0][0]
+    return (await this.connection.execute(`
+      UPDATE user SET phone=${this.escape(phone)} WHERE id=${id}
+    `))[0][0]
   }
 }
 
