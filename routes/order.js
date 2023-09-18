@@ -6,7 +6,7 @@ var cartDAL = require('../DAL/CartDAL');
 
 router.get('/:id', async function(req, res, next) {
   if(req.session.user){
-    const response = await orderDAL.getOrder({id: req.params.id, user: req.session.user.id})
+    const response = await orderDAL.getOrder({id: req.params.id, user: req.session.user})
     res.json(response);
   } else {
     res.json({})
