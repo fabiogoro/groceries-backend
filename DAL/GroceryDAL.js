@@ -30,7 +30,7 @@ class GroceryDAL extends DAL{
   async getGrocery(id){
     const res = (await this.connection.execute(`
       SELECT *, 
-        (select name from category where category.id=category) category_name 
+        (select category_sequence from category_name_tree where category_name_tree.id=category) category_name 
       FROM grocery 
       WHERE id=${id}
     `))[0][0]
@@ -65,10 +65,10 @@ class GroceryDAL extends DAL{
                         ${this.escape(title)}, 
                         ${this.escape(description)}, 
                         ${this.escape(price)}, 
-                        ${this.escape(calories)}, 
-                        ${this.escape(proteins)}, 
-                        ${this.escape(carbohydrates)}, 
-                        ${this.escape(fats)}, 
+                        ${calories}, 
+                        ${proteins}, 
+                        ${carbohydrates}, 
+                        ${fats}, 
                         ${this.escape(category)}
                       )
         `)
