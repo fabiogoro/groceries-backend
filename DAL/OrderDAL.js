@@ -18,7 +18,7 @@ class OrderDAL extends DAL{
       res = (await this.connection.execute(`SELECT * FROM \`order\` where id=${id} and user=${user.id}`))[0][0]
     }
     if(res){
-      res.groceries = (await this.connection.execute(`SELECT * FROM grocery_order join grocery on grocery=id where \`order\`=${id}`))[0]
+      res.groceries = (await this.connection.execute(`SELECT title, grocery, grocery id, quantity, grocery_order.price FROM grocery_order join grocery on grocery=id where \`order\`=${id}`))[0]
       res.address_info = (await this.connection.execute(`SELECT * FROM address where id=${res.address}`))[0][0]
       res.user_info = (await this.connection.execute(`SELECT * FROM user where id=${res.user}`))[0][0]
       return res

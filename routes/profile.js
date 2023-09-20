@@ -6,7 +6,7 @@ router.post('/', async (req, res) => {
   if (req.session.user) {
     if(req.body.old_password.length!=0 && (await userDAL.getUser({...req.session.user, password: req.body.old_password}))){
       await userDAL.updateUserPassword(req.body.new_password, req.session.user.id)
-    } else {
+    } else if(req.body.old_password.length!=0) {
       res.json({
         error: {message: 'Please check you password.', field: 'old_password'},
       });
@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     if(!req.body.address_id){
       req.body.address_id = await userDAL.createAddress({...req.body, user_id: req.session.user.id})
     }
-    res.json({success: 'Profile successfully updated.', redirect: '/profile'});
+    res.json({success: 'Profile successfully updated.', redirect: '/profile?message=Profile successfully updated.'});
   } else {
     res.json({
       error: 'You must be logged in to update your profile.',
