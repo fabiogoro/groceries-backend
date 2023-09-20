@@ -65,10 +65,10 @@ class GroceryDAL extends DAL{
                         ${this.escape(title)}, 
                         ${this.escape(description)}, 
                         ${this.escape(price)}, 
-                        ${calories}, 
-                        ${proteins}, 
-                        ${carbohydrates}, 
-                        ${fats}, 
+                        ${this.escape(calories)}, 
+                        ${this.escape(proteins)}, 
+                        ${this.escape(carbohydrates)}, 
+                        ${this.escape(fats)}, 
                         ${this.escape(category)}
                       )
         `)
