@@ -16,6 +16,7 @@ class DAL{
   }
 
   escape(param){
+    if(!param) return 'NULL'
     return mysql.escape(param)
   }
 }
