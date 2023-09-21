@@ -1,16 +1,16 @@
-var express = require('express');
-var router = express.Router();
-var userDAL = require('../DAL/UserDAL');
+var express = require('express')
+var router = express.Router()
+var userDAL = require('../DAL/UserDAL')
 var formHandler = require('../util/formHandler')
 
-router.get('/', async function(req, res, next) {
+router.get('/', async function(req, res) {
   if(req.session.user){
-    res.json(await userDAL.getUser({email: req.session.user.email}));
+    res.json(await userDAL.getUser({email: req.session.user.email}))
   }
   else {
     res.json({})
   }
-});
+})
 
 async function signUpValidations(req){
   const user = await userDAL.getUserByEmail(req.body)
@@ -23,6 +23,6 @@ async function signUpValidations(req){
   }
 }
 
-router.post('/', formHandler(userDAL.createUser.bind(userDAL), required=['email', 'password', 'name'], signUpValidations));
+router.post('/', formHandler(userDAL.createUser.bind(userDAL), ['email', 'password', 'name'], signUpValidations))
 
-module.exports = router;
+module.exports = router

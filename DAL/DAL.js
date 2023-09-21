@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise')
-const fs = require('fs')
 
 class DAL{
   constructor(){
@@ -21,4 +20,4 @@ class DAL{
   }
 }
 
-module.exports = DAL;
+module.exports = DAL

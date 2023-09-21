@@ -1,4 +1,4 @@
-var nodemailer = require('nodemailer');
+var nodemailer = require('nodemailer')
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -6,7 +6,7 @@ var transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS
   }
-});
+})
 
 function sendMail(to, title, text){
   var mailOptions = {
@@ -14,14 +14,14 @@ function sendMail(to, title, text){
     to: to,
     subject: title,
     html: text
-  };
+  }
 
-  transporter.sendMail(mailOptions, function(error, info){
+  transporter.sendMail(mailOptions, function(error){
     if (error) {
-      console.log(error);
+      console.log(error)
     }
-  });
+  })
 }
 
 
-module.exports = sendMail;
+module.exports = sendMail

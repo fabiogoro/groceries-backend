@@ -1,7 +1,7 @@
-const crypto = require('crypto');
+const crypto = require('crypto')
 
 function encrypt(val){
-  const sha256 = crypto.createHash('sha256');
+  const sha256 = crypto.createHash('sha256')
   return sha256.update(val).digest('base64')
 }
 

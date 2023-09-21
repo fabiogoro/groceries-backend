@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const crypto = require('crypto')
 
 class PasswordResetHelper{
   constructor(){
@@ -6,17 +6,17 @@ class PasswordResetHelper{
   }
 
   generateToken(){
-    return crypto.randomBytes(30).toString('hex');
+    return crypto.randomBytes(30).toString('hex')
   }
 
   registerPasswordReset(user){
-    const authToken = this.generateToken();
-    this.passwordResetTokens[authToken] = {user, timestamp: Date.now()};
+    const authToken = this.generateToken()
+    this.passwordResetTokens[authToken] = {user, timestamp: Date.now()}
     return authToken
   }
 
   consumePasswordResetToken(token){
-    const data = this.passwordResetTokens[token];
+    const data = this.passwordResetTokens[token]
     if(!data){
       return
     }

@@ -82,7 +82,7 @@ class UserDAL extends DAL{
         ${this.escape(country)}
       )
     `)
-    const responseUser = await this.connection.execute(`
+    await this.connection.execute(`
       INSERT user_address (user, address) 
       VALUES ('${user_id}', '${response[0].insertId}')
     `)
