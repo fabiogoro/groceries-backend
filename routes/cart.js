@@ -1,12 +1,12 @@
-var express = require('express');
-var cartDAL = require('../DAL/CartDAL');
-var router = express.Router();
+var express = require('express')
+var cartDAL = require('../DAL/CartDAL')
+var router = express.Router()
 
-router.get('/', async function(req, res, next) {
+router.get('/', async function(req, res) {
   if(req.session.user){
     let cartId = await cartDAL.getCartId(req.session.user)
     if(cartId){
-      res.json(await cartDAL.getCart(cartId));
+      res.json(await cartDAL.getCart(cartId))
     } else {
       res.json([])
     }
@@ -14,9 +14,9 @@ router.get('/', async function(req, res, next) {
   else {
     res.json([])
   }
-});
+})
 
-router.post('/add/:id', async function(req, res, next) {
+router.post('/add/:id', async function(req, res) {
   if(req.session.user){
     let cartId = await cartDAL.getCartId(req.session.user)
     if(cartId==undefined){
@@ -37,14 +37,14 @@ router.post('/add/:id', async function(req, res, next) {
       })
     }
     cart = await cartDAL.getCart(cartId)
-    res.json(cart);
+    res.json(cart)
   }
   else {
     res.json({})
   }
-});
+})
 
-router.post('/remove/:id', async function(req, res, next) {
+router.post('/remove/:id', async function(req, res) {
   if(req.session.user){
     let cartId = await cartDAL.getCartId(req.session.user)
     if(cartId==undefined){
@@ -59,11 +59,11 @@ router.post('/remove/:id', async function(req, res, next) {
       await cartDAL.deleteGroceryCart({cart: grocery.cart_id, grocery: grocery.id})
     }
     cart = await cartDAL.getCart(cartId)
-    res.json(cart);
+    res.json(cart)
   }
   else {
     res.json({error: 'User must be logged in to request cart info'})
   }
-});
+})
 
-module.exports = router;
+module.exports = router

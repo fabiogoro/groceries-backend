@@ -1,7 +1,7 @@
-var express = require('express');
-var sendMail = require('../util/mailer');
-var userDAL = require('../DAL/UserDAL');
-var router = express.Router();
+var express = require('express')
+var sendMail = require('../util/mailer')
+var userDAL = require('../DAL/UserDAL')
+var router = express.Router()
 
 router.post('/', async (req, res) => {
   const user = await userDAL.getUserByEmail(req.body)
@@ -16,13 +16,13 @@ router.post('/', async (req, res) => {
     <p>Regards,</p>
     <p>Groceries store team</p>
     `)
-    res.json({success: 'You will receive an email with further instructions.'});
+    res.json({success: 'You will receive an email with further instructions.'})
   } else {
     res.json({
       error: {field: 'email', message: 'Invalid email',}
-    });
+    })
   }
-});
+})
 
 router.post('/password', async (req, res) => {
   const user = req.passwordResetHelper.consumePasswordResetToken(req.body.token)
@@ -32,6 +32,6 @@ router.post('/password', async (req, res) => {
   }else{
     res.json({error: 'Invalid token.'})
   }
-});
+})
 
 module.exports = router

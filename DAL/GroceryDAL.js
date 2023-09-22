@@ -39,16 +39,16 @@ class GroceryDAL extends DAL{
   }
 
   async createGrocery({title, 
-                        description, 
-                        price, 
-                        category,
-                        image, id, fats, proteins, carbohydrates, calories}){
+    description, 
+    price, 
+    category,
+    image, id, fats, proteins, carbohydrates, calories}){
     if(id){
       return await this.updateGrocery({title, 
-                        description, 
-                        price, 
-                        category,
-                        image, id, fats, proteins, carbohydrates, calories})
+        description, 
+        price, 
+        category,
+        image, id, fats, proteins, carbohydrates, calories})
     }
     const response = await this.connection.execute(`
           INSERT grocery (
@@ -86,11 +86,11 @@ class GroceryDAL extends DAL{
   }
 
   async updateGrocery({title, 
-                        description, 
-                        price, 
-                        category,
-                        image, id, fats, proteins, carbohydrates, calories}){
-    const response = await this.connection.execute(`
+    description, 
+    price, 
+    category,
+    image, id, fats, proteins, carbohydrates, calories}){
+    await this.connection.execute(`
           UPDATE grocery SET 
                         title=${this.escape(title)}, 
                         description=${this.escape(description)}, 
@@ -102,12 +102,12 @@ class GroceryDAL extends DAL{
                         category=${this.escape(category)}
           WHERE id=${id}
         `)
-    const response2 = await this.connection.execute(`
+    const response = await this.connection.execute(`
           UPDATE grocery_picture 
           SET path=${this.escape(image)}
           WHERE grocery=${id}
         `)
-    return response2
+    return response
   }
 }
 

@@ -44,7 +44,7 @@ class CartDAL extends DAL{
     `))
   }
 
-  async deleteGroceryCart({cart, grocery, amount}){
+  async deleteGroceryCart({cart, grocery}){
     return (await this.connection.execute(`
       DELETE FROM grocery_cart 
       WHERE cart=${cart} AND grocery=${grocery}
